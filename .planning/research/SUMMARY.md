@@ -17,16 +17,16 @@ The critical risks center on WhatsApp session stability (unofficial API can disc
 
 ### Recommended Stack
 
-NanoClaw provides the foundation — a Node.js 22 process using TypeScript, better-sqlite3 for state, Docker for agent isolation, and Baileys 6.7.21 for WhatsApp connectivity. The project requires zero database servers (SQLite suffices), zero web frameworks (NanoClaw polls channels internally), and zero custom authentication (WhatsApp pairing, Claude API key, Google OAuth are all handled externally).
+NanoClaw provides the foundation- a Node.js 22 process using TypeScript, better-sqlite3 for state, Docker for agent isolation, and Baileys 6.7.21 for WhatsApp connectivity. The project requires zero database servers (SQLite suffices), zero web frameworks (NanoClaw polls channels internally), and zero custom authentication (WhatsApp pairing, Claude API key, Google OAuth are all handled externally).
 
 **Core technologies:**
-- **NanoClaw (forked)**: AI agent orchestrator with WhatsApp support, message routing, container isolation, and task scheduling — chosen because it already solves 90% of the problem domain
-- **Node.js 22 LTS + TypeScript 5.7**: Runtime environment — required by NanoClaw's .nvmrc specification
-- **Docker 24+**: Container runtime for isolated agent execution — critical security boundary against prompt injection
-- **SQLite via better-sqlite3**: Persistent state for messages, tasks, conversations — zero-config, single-file, sufficient for 5-10 clients
-- **Baileys 6.7.21**: WhatsApp Web protocol client — reverse-engineered, unofficial but actively maintained, what NanoClaw uses
-- **googleapis + google-auth-library**: Google Calendar API integration — official client library, mandatory for scheduling functionality
-- **EC2 t3.micro/t3.small**: Infrastructure — persistent compute for long-running process (Lambda unsuitable), $3-8/month reserved pricing
+- **NanoClaw (forked)**: AI agent orchestrator with WhatsApp support, message routing, container isolation, and task scheduling- chosen because it already solves 90% of the problem domain
+- **Node.js 22 LTS + TypeScript 5.7**: Runtime environment- required by NanoClaw's .nvmrc specification
+- **Docker 24+**: Container runtime for isolated agent execution- critical security boundary against prompt injection
+- **SQLite via better-sqlite3**: Persistent state for messages, tasks, conversations- zero-config, single-file, sufficient for 5-10 clients
+- **Baileys 6.7.21**: WhatsApp Web protocol client- reverse-engineered, unofficial but actively maintained, what NanoClaw uses
+- **googleapis + google-auth-library**: Google Calendar API integration- official client library, mandatory for scheduling functionality
+- **EC2 t3.micro/t3.small**: Infrastructure- persistent compute for long-running process (Lambda unsuitable), $3-8/month reserved pricing
 
 **What NOT to use:**
 - Baileys 7.x RC (stalled since Nov 2025, unstable)
@@ -40,22 +40,22 @@ NanoClaw provides the foundation — a Node.js 22 process using TypeScript, bett
 The research identified clear boundaries between must-have table stakes (without which the assistant provides no value), differentiators (which reduce consultant workload meaningfully), and anti-features (deliberately avoided to prevent scope creep or risk).
 
 **Must have (table stakes):**
-- **Tag-to-reply in WhatsApp** — core value proposition, without this the assistant is useless
-- **Knowledge brief ingestion** — consultant's services, pricing, and voice must shape all responses
-- **Voice/style matching** — clients know this person; generic chatbot tone breaks trust
-- **Google Calendar availability check** — "When are you free?" is the most common client question
-- **Meeting scheduling** — checking availability is only half the value; must also create events
-- **Multi-conversation context isolation** — never leak Client A's info into Client B's conversation
-- **Graceful handoff/uncertainty handling** — say "Let me check with [name]" rather than hallucinate
-- **Always-on availability** — clients message at any hour; EC2 with systemd ensures 24/7 operation
+- **Tag-to-reply in WhatsApp**- core value proposition, without this the assistant is useless
+- **Knowledge brief ingestion**- consultant's services, pricing, and voice must shape all responses
+- **Voice/style matching**- clients know this person; generic chatbot tone breaks trust
+- **Google Calendar availability check**- "When are you free?" is the most common client question
+- **Meeting scheduling**- checking availability is only half the value; must also create events
+- **Multi-conversation context isolation**- never leak Client A's info into Client B's conversation
+- **Graceful handoff/uncertainty handling**- say "Let me check with [name]" rather than hallucinate
+- **Always-on availability**- clients message at any hour; EC2 with systemd ensures 24/7 operation
 
 **Should have (competitive):**
-- **Scheduled follow-ups** — "Follow up with Client X on Friday if they haven't responded" prevents dropped balls
-- **Meeting prep summaries** — before scheduled meetings, send consultant a summary of recent conversation
-- **Client-specific memory** — remember Client A prefers Tuesday meetings, Client B's project name, etc.
-- **Recurring task automation** — "Every Monday, remind Client X about weekly standup link"
-- **Web research on behalf of client** — answer "What's the latest on EU AI Act?" with fresh data, not just training data
-- **Weekly digest** — every Monday morning, summary of active clients, pending follow-ups, meetings this week
+- **Scheduled follow-ups**- "Follow up with Client X on Friday if they haven't responded" prevents dropped balls
+- **Meeting prep summaries**- before scheduled meetings, send consultant a summary of recent conversation
+- **Client-specific memory**- remember Client A prefers Tuesday meetings, Client B's project name, etc.
+- **Recurring task automation**- "Every Monday, remind Client X about weekly standup link"
+- **Web research on behalf of client**- answer "What's the latest on EU AI Act?" with fresh data, not just training data
+- **Weekly digest**- every Monday morning, summary of active clients, pending follow-ups, meetings this week
 
 **Defer (v2+):**
 - Proposal/quote drafting (valuable but not urgent; consultant can draft initially)
@@ -71,38 +71,38 @@ The research identified clear boundaries between must-have table stakes (without
 
 ### Architecture Approach
 
-NanoClaw is a single Node.js process that orchestrates AI agent execution in isolated Docker containers. The host process manages WhatsApp connectivity (Baileys WebSocket), polls SQLite every 2 seconds for new messages in registered groups, enqueues work in per-group FIFO queues with global concurrency limits, spawns Docker containers that run the Claude Agent SDK, and watches filesystem IPC directories for messages containers want to send back. Agents run in containers with mounted group folders (read-write workspace), global folder (read-only shared knowledge), and session directories (conversation history for resumption). This architecture is already defined by the framework — customization happens via CLAUDE.md files (knowledge brief), custom MCP servers (Google Calendar), and container tuning (memory limits, concurrency).
+NanoClaw is a single Node.js process that orchestrates AI agent execution in isolated Docker containers. The host process manages WhatsApp connectivity (Baileys WebSocket), polls SQLite every 2 seconds for new messages in registered groups, enqueues work in per-group FIFO queues with global concurrency limits, spawns Docker containers that run the Claude Agent SDK, and watches filesystem IPC directories for messages containers want to send back. Agents run in containers with mounted group folders (read-write workspace), global folder (read-only shared knowledge), and session directories (conversation history for resumption). This architecture is already defined by the framework- customization happens via CLAUDE.md files (knowledge brief), custom MCP servers (Google Calendar), and container tuning (memory limits, concurrency).
 
 **Major components:**
-1. **NanoClaw Host Process** — orchestrates everything: WhatsApp channel (Baileys), message loop (2s poll), task scheduler (60s poll), IPC watcher (1s poll), group queue (FIFO with concurrency limit), container runner (Docker spawn/cleanup)
-2. **Agent Containers** — isolated Docker environments running Claude Agent SDK with tools (Bash, Read, Write, WebSearch, etc.) and MCP servers (nanoclaw for send_message/schedule_task, custom gcal for calendar operations)
-3. **Data Layer** — SQLite for transactional state (messages, tasks, sessions), filesystem for group memory (CLAUDE.md), WhatsApp auth (Baileys creds), and IPC (container-to-host communication)
-4. **Google Calendar MCP Server (NEW)** — custom TypeScript MCP server using stdio transport, wraps googleapis client, exposes tools (check_availability, create_event, list_events), mounted into containers as additional MCP server alongside nanoclaw
+1. **NanoClaw Host Process**- orchestrates everything: WhatsApp channel (Baileys), message loop (2s poll), task scheduler (60s poll), IPC watcher (1s poll), group queue (FIFO with concurrency limit), container runner (Docker spawn/cleanup)
+2. **Agent Containers**- isolated Docker environments running Claude Agent SDK with tools (Bash, Read, Write, WebSearch, etc.) and MCP servers (nanoclaw for send_message/schedule_task, custom gcal for calendar operations)
+3. **Data Layer**- SQLite for transactional state (messages, tasks, sessions), filesystem for group memory (CLAUDE.md), WhatsApp auth (Baileys creds), and IPC (container-to-host communication)
+4. **Google Calendar MCP Server (NEW)**- custom TypeScript MCP server using stdio transport, wraps googleapis client, exposes tools (check_availability, create_event, list_events), mounted into containers as additional MCP server alongside nanoclaw
 
 **Key architecture decisions:**
-- Run NanoClaw natively on EC2 host (not containerized) — avoids known Linux container-in-container issues (#1487)
-- Use t3.small over t3.micro if budget allows — extra 1GB RAM ($4/month) prevents OOM kills under load
-- Set MAX_CONCURRENT_CONTAINERS=1-2 — consultant has 5-10 clients, parallel processing rarely needed
-- Store knowledge brief in groups/global/CLAUDE.md — agent runner loads this automatically, no custom code
-- Mount Google credentials separately from CLAUDE.md — prevents tokens from leaking into agent context
+- Run NanoClaw natively on EC2 host (not containerized)- avoids known Linux container-in-container issues (#1487)
+- Use t3.small over t3.micro if budget allows- extra 1GB RAM ($4/month) prevents OOM kills under load
+- Set MAX_CONCURRENT_CONTAINERS=1-2- consultant has 5-10 clients, parallel processing rarely needed
+- Store knowledge brief in groups/global/CLAUDE.md- agent runner loads this automatically, no custom code
+- Mount Google credentials separately from CLAUDE.md- prevents tokens from leaking into agent context
 
 ### Critical Pitfalls
 
 Research identified seven critical pitfalls, each with Phase 1-3 prevention strategies. The most dangerous risks involve WhatsApp stability and account bans, which are existential threats to a consultant using their personal business number.
 
-1. **WhatsApp session disconnection** — Baileys WebSocket can drop at any time due to WhatsApp server-side detection, protocol changes, or token expiry. Reconnection requires manual QR scanning over SSH. **Prevention:** aggressive session persistence (verify Docker volumes preserve auth state), health-check cron (verify connection every 60s), alerting (email/SMS on disconnect), documented runbook for re-auth, consider lightweight web interface to display QR remotely.
+1. **WhatsApp session disconnection**- Baileys WebSocket can drop at any time due to WhatsApp server-side detection, protocol changes, or token expiry. Reconnection requires manual QR scanning over SSH. **Prevention:** aggressive session persistence (verify Docker volumes preserve auth state), health-check cron (verify connection every 60s), alerting (email/SMS on disconnect), documented runbook for re-auth, consider lightweight web interface to display QR remotely.
 
-2. **WhatsApp account ban** — Using unofficial APIs violates WhatsApp ToS. Consultant's personal number gets permanently banned, losing primary business communication channel with all clients. **Prevention:** never use real number for development/testing (use separate test number), implement rate limiting (2-5 second artificial delays before responses), never send bulk or identical messages, avoid connect/disconnect cycling, have fallback plan (WhatsApp appeal process, temporary client communication strategy).
+2. **WhatsApp account ban**- Using unofficial APIs violates WhatsApp ToS. Consultant's personal number gets permanently banned, losing primary business communication channel with all clients. **Prevention:** never use real number for development/testing (use separate test number), implement rate limiting (2-5 second artificial delays before responses), never send bulk or identical messages, avoid connect/disconnect cycling, have fallback plan (WhatsApp appeal process, temporary client communication strategy).
 
-3. **Claude API cost spiral** — Each WhatsApp message triggers Claude API call. With 10 messages of context, long knowledge briefs, and tool-use loops, a single interaction can hit 5-10K tokens. At 50 interactions/day, that's $7.50-$75/month on Haiku alone. **Prevention:** use Haiku 4.5 exclusively ($1/$5 per MTok), set MAX_MESSAGES_PER_PROMPT=5-7, implement spending caps via Anthropic dashboard, monitor token usage per interaction, keep knowledge brief under 2K tokens, enable prompt caching for system prompt.
+3. **Claude API cost spiral**- Each WhatsApp message triggers Claude API call. With 10 messages of context, long knowledge briefs, and tool-use loops, a single interaction can hit 5-10K tokens. At 50 interactions/day, that's $7.50-$75/month on Haiku alone. **Prevention:** use Haiku 4.5 exclusively ($1/$5 per MTok), set MAX_MESSAGES_PER_PROMPT=5-7, implement spending caps via Anthropic dashboard, monitor token usage per interaction, keep knowledge brief under 2K tokens, enable prompt caching for system prompt.
 
-4. **t3.micro OOM kills** — 1GB RAM with Node.js (~100-200MB), Docker containers (each another Node.js process), and SQLite queries easily exceeds capacity with MAX_CONCURRENT_CONTAINERS=5 default. **Prevention:** set MAX_CONCURRENT_CONTAINERS=1-2, configure Docker memory limits (--memory=256m), enable 1-2GB swap file, immediate log rotation (NanoClaw issue #1554 documents unbounded log growth), monitor with CloudWatch at 80% threshold, consider t3.small upgrade.
+4. **t3.micro OOM kills**- 1GB RAM with Node.js (~100-200MB), Docker containers (each another Node.js process), and SQLite queries easily exceeds capacity with MAX_CONCURRENT_CONTAINERS=5 default. **Prevention:** set MAX_CONCURRENT_CONTAINERS=1-2, configure Docker memory limits (--memory=256m), enable 1-2GB swap file, immediate log rotation (NanoClaw issue #1554 documents unbounded log growth), monitor with CloudWatch at 80% threshold, consider t3.small upgrade.
 
-5. **Google OAuth token expiry** — Refresh tokens expire after 6 months for apps in "testing" mode, or if revoked by user. When expired on headless EC2, calendar operations silently fail. **Prevention:** use Service Account instead of OAuth2 user flow (long-lived credentials, no browser re-auth), or if OAuth: store refresh tokens securely, implement automatic refresh, keep project in "production" mode, implement fallback response ("unable to check calendar, will follow up").
+5. **Google OAuth token expiry**- Refresh tokens expire after 6 months for apps in "testing" mode, or if revoked by user. When expired on headless EC2, calendar operations silently fail. **Prevention:** use Service Account instead of OAuth2 user flow (long-lived credentials, no browser re-auth), or if OAuth: store refresh tokens securely, implement automatic refresh, keep project in "production" mode, implement fallback response ("unable to check calendar, will follow up").
 
-6. **NanoClaw Linux container crashes** — Documented issues (#1445, #1487) with running NanoClaw inside containers on Linux due to filesystem permissions, networking (iptables/nftables), and environment variable handling differences between macOS and Linux. **Prevention:** run NanoClaw directly on EC2 host (not containerized), use Docker only for agent containers NanoClaw spawns, test exact EC2 AMI and Docker version before deploying, pin versions in deployment script, staging instance for initial testing.
+6. **NanoClaw Linux container crashes**- Documented issues (#1445, #1487) with running NanoClaw inside containers on Linux due to filesystem permissions, networking (iptables/nftables), and environment variable handling differences between macOS and Linux. **Prevention:** run NanoClaw directly on EC2 host (not containerized), use Docker only for agent containers NanoClaw spawns, test exact EC2 AMI and Docker version before deploying, pin versions in deployment script, staging instance for initial testing.
 
-7. **Knowledge brief drift** — Static text file loaded at startup has no reminder to update. Over time, services change, pricing updates, brief becomes stale. Assistant confidently quotes outdated pricing. **Prevention:** version brief in git with deployment, add "last reviewed" date + monthly review reminder, structure as markdown sections for surgical updates, include "valid until" field for time-sensitive info, implement WhatsApp command "/update-brief" for updates without SSH.
+7. **Knowledge brief drift**- Static text file loaded at startup has no reminder to update. Over time, services change, pricing updates, brief becomes stale. Assistant confidently quotes outdated pricing. **Prevention:** version brief in git with deployment, add "last reviewed" date + monthly review reminder, structure as markdown sections for surgical updates, include "valid until" field for time-sensitive info, implement WhatsApp command "/update-brief" for updates without SSH.
 
 ## Implications for Roadmap
 
@@ -128,9 +128,9 @@ Based on combined research, the project should be structured into 5 phases with 
 - Multi-conversation context isolation (NanoClaw built-in, verify it works)
 
 **Avoids pitfalls:**
-- #4: t3.micro OOM kills — addressed via container tuning, swap, monitoring
-- #6: NanoClaw Linux crashes — addressed via native host deployment, testing on target AMI
-- #1: WhatsApp session disconnection — addressed via health monitoring foundation (alerting added Phase 2)
+- #4: t3.micro OOM kills- addressed via container tuning, swap, monitoring
+- #6: NanoClaw Linux crashes- addressed via native host deployment, testing on target AMI
+- #1: WhatsApp session disconnection- addressed via health monitoring foundation (alerting added Phase 2)
 
 **Research flag:** Standard deployment pattern; NanoClaw docs + EC2 setup are well-documented. No additional research needed.
 
@@ -157,9 +157,9 @@ Based on combined research, the project should be structured into 5 phases with 
 - Client-specific memory foundation (differentiator)
 
 **Avoids pitfalls:**
-- #7: Knowledge brief drift — addressed via versioning, review date, git tracking
-- #2: WhatsApp account ban — still using test number; real number connected only after style/behavior validated
-- #1: WhatsApp session disconnection — alerting now in place for fast recovery
+- #7: Knowledge brief drift- addressed via versioning, review date, git tracking
+- #2: WhatsApp account ban- still using test number; real number connected only after style/behavior validated
+- #1: WhatsApp session disconnection- alerting now in place for fast recovery
 
 **Research flag:** Prompt engineering and style guidelines. May benefit from `/gsd:research-phase` on "consultant communication style best practices" if consultant has no existing style guide.
 
@@ -183,7 +183,7 @@ Based on combined research, the project should be structured into 5 phases with 
 - Meeting scheduling (table stakes)
 
 **Avoids pitfalls:**
-- #5: Google OAuth token expiry — addressed via service account or production-mode OAuth with refresh monitoring
+- #5: Google OAuth token expiry- addressed via service account or production-mode OAuth with refresh monitoring
 
 **Research flag:** Moderate complexity. Google Calendar API is well-documented, but MCP server creation and container integration may need `/gsd:research-phase` on "building custom MCP servers for NanoClaw" if patterns aren't clear from existing nanoclaw MCP code.
 
@@ -232,8 +232,8 @@ Based on combined research, the project should be structured into 5 phases with 
 - Web research on behalf of client (differentiator)
 
 **Avoids pitfalls:**
-- #2: WhatsApp account ban — real number connected only after extensive validation, with rate limiting in place
-- #3: Claude API cost spiral — monitoring and caps prevent overruns
+- #2: WhatsApp account ban- real number connected only after extensive validation, with rate limiting in place
+- #3: Claude API cost spiral- monitoring and caps prevent overruns
 
 **Research flag:** Operational best practices. Standard patterns; no additional research needed.
 
@@ -294,25 +294,25 @@ The technical stack and architecture have very high confidence because NanoClaw 
 ## Sources
 
 ### Primary (HIGH confidence)
-- **NanoClaw GitHub repository** (qwibitai/nanoclaw, HEAD @ 2026-04-01) — complete source code analysis: architecture, component boundaries, data flow, default configurations, known issues
-- **NanoClaw SPEC.md** — upstream architecture documentation with diagrams and deployment instructions
-- **NanoClaw REQUIREMENTS.md** — design principles and component specifications
-- **NanoClaw issues** — #1445 (Linux setup), #1487 (container crashes), #1522 (media messages), #1554 (unbounded logs), #1485 (Docker support)
-- **npm registry** — version numbers, publish dates, and deprecation status for all dependencies (baileys, better-sqlite3, googleapis, etc.)
-- **AWS EC2 pricing and specifications** — t3.micro/small specs, regional pricing
-- **Anthropic API pricing documentation** — Claude Haiku/Sonnet/Opus per-token costs
-- **Google Calendar API documentation** — googleapis usage patterns, OAuth2 flow, service account setup
+- **NanoClaw GitHub repository** (qwibitai/nanoclaw, HEAD @ 2026-04-01)- complete source code analysis: architecture, component boundaries, data flow, default configurations, known issues
+- **NanoClaw SPEC.md**- upstream architecture documentation with diagrams and deployment instructions
+- **NanoClaw REQUIREMENTS.md**- design principles and component specifications
+- **NanoClaw issues**- #1445 (Linux setup), #1487 (container crashes), #1522 (media messages), #1554 (unbounded logs), #1485 (Docker support)
+- **npm registry**- version numbers, publish dates, and deprecation status for all dependencies (baileys, better-sqlite3, googleapis, etc.)
+- **AWS EC2 pricing and specifications**- t3.micro/small specs, regional pricing
+- **Anthropic API pricing documentation**- Claude Haiku/Sonnet/Opus per-token costs
+- **Google Calendar API documentation**- googleapis usage patterns, OAuth2 flow, service account setup
 
 ### Secondary (MEDIUM confidence)
-- **Baileys GitHub repository** (WhiskeySockets/Baileys) — ToS warnings, ban risk disclaimers, community reports
-- **whatsapp-web.js issues** — #3948, #3894 documenting account restrictions after QR scanning (illustrates ban risk)
-- **WATI WhatsApp AI chatbot guide** (wati.io) — business chatbot feature landscape
-- **Trengo WhatsApp AI chatbot guide** (trengo.com) — knowledge base, escalation, CRM integration patterns
-- **PROJECT.md** — consultant requirements, constraints, out-of-scope items
+- **Baileys GitHub repository** (WhiskeySockets/Baileys)- ToS warnings, ban risk disclaimers, community reports
+- **whatsapp-web.js issues**- #3948, #3894 documenting account restrictions after QR scanning (illustrates ban risk)
+- **WATI WhatsApp AI chatbot guide** (wati.io)- business chatbot feature landscape
+- **Trengo WhatsApp AI chatbot guide** (trengo.com)- knowledge base, escalation, CRM integration patterns
+- **PROJECT.md**- consultant requirements, constraints, out-of-scope items
 
 ### Tertiary (LOW confidence, needs validation)
-- **Domain knowledge of consultant workflows** — inferred from business communication patterns, not validated with actual consultant interviews
-- **WhatsApp Business API ecosystem** — used for competitive feature research, but consultant is not using official Business API
+- **Domain knowledge of consultant workflows**- inferred from business communication patterns, not validated with actual consultant interviews
+- **WhatsApp Business API ecosystem**- used for competitive feature research, but consultant is not using official Business API
 
 ---
 

@@ -1,6 +1,6 @@
 # Nano-Claw WhatsApp Assistant
 
-A personal AI assistant for an independent AI/Data/Software consultant, built on [NanoClaw](https://github.com/qwibitai/nanoclaw) and deployed on AWS EC2. When tagged in a WhatsApp conversation, it replies to clients on the consultant's behalf — answering questions, scheduling meetings via Google Calendar, and handling recurring tasks.
+A personal AI assistant for an independent AI/Data/Software consultant, built on [NanoClaw](https://github.com/qwibitai/nanoclaw) and deployed on AWS EC2. When tagged in a WhatsApp conversation, it replies to clients on the consultant's behalf- answering questions, scheduling meetings via Google Calendar, and handling recurring tasks.
 
 ## How It Works
 
@@ -20,20 +20,20 @@ Spawns isolated Docker container with Claude Agent SDK
 Reply sent back to WhatsApp conversation
 ```
 
-The assistant only responds when explicitly tagged — no autopilot. This keeps the consultant in control while offloading routine client communication.
+The assistant only responds when explicitly tagged- no autopilot. This keeps the consultant in control while offloading routine client communication.
 
 ## Features
 
 ### v1 (Current Scope)
 
-- **Tag-to-reply** — Responds when tagged in any WhatsApp group or DM
-- **Knowledge-driven responses** — Loaded with a brief about services, pricing, expertise, and communication style
-- **Voice matching** — Replies in the consultant's tone, not generic chatbot speak
-- **Graceful handoff** — Says "let me check with [name]" when uncertain, never fabricates commitments
-- **Google Calendar integration** — Checks real availability, schedules meetings with client details
-- **Recurring tasks** — Weekly reminders, follow-ups, scheduled messages via NanoClaw's built-in scheduler
-- **Context isolation** — Client A's conversation never leaks into Client B's context
-- **Always-on** — Runs 24/7 on EC2 with automatic crash recovery
+- **Tag-to-reply**- Responds when tagged in any WhatsApp group or DM
+- **Knowledge-driven responses**- Loaded with a brief about services, pricing, expertise, and communication style
+- **Voice matching**- Replies in the consultant's tone, not generic chatbot speak
+- **Graceful handoff**- Says "let me check with [name]" when uncertain, never fabricates commitments
+- **Google Calendar integration**- Checks real availability, schedules meetings with client details
+- **Recurring tasks**- Weekly reminders, follow-ups, scheduled messages via NanoClaw's built-in scheduler
+- **Context isolation**- Client A's conversation never leaks into Client B's context
+- **Always-on**- Runs 24/7 on EC2 with automatic crash recovery
 
 ### v2 (Planned)
 
@@ -48,7 +48,7 @@ The assistant only responds when explicitly tagged — no autopilot. This keeps 
 ```
 ┌────────────────────── EC2 (t3.small) ──────────────────────┐
 │                                                             │
-│  NanoClaw Host (Node.js 22, native — not containerized)    │
+│  NanoClaw Host (Node.js 22, native- not containerized)    │
 │  ├── WhatsApp Channel (Baileys 6.7.x WebSocket)           │
 │  ├── Message Loop (polls SQLite every 2s)                  │
 │  ├── Task Scheduler (polls SQLite every 60s)               │
@@ -72,9 +72,9 @@ The assistant only responds when explicitly tagged — no autopilot. This keeps 
 
 **Key design decisions:**
 - NanoClaw runs natively on EC2 host (not containerized) to avoid known Linux container-in-container issues
-- Docker is used only for agent containers that NanoClaw spawns — security boundary against prompt injection
+- Docker is used only for agent containers that NanoClaw spawns- security boundary against prompt injection
 - Container concurrency tuned for t3.small (MAX_CONCURRENT_CONTAINERS=1-2, memory limits, reduced timeouts)
-- Google Calendar via custom MCP server (not hardcoded API calls) — follows NanoClaw's extension patterns
+- Google Calendar via custom MCP server (not hardcoded API calls)- follows NanoClaw's extension patterns
 - Service Account auth for Google Calendar (no token expiry issues on headless EC2)
 
 ## Tech Stack
@@ -87,7 +87,7 @@ The assistant only responds when explicitly tagged — no autopilot. This keeps 
 | WhatsApp | Baileys 6.7.21 (stable) | Protocol-level, no browser needed, NanoClaw's chosen library |
 | Database | SQLite via better-sqlite3 | Zero-config, single-file, sufficient for 5-10 clients |
 | Calendar | googleapis + google-auth-library | Official Google client, Service Account auth |
-| Containers | Docker 24+ | Agent isolation — each request runs in its own container |
+| Containers | Docker 24+ | Agent isolation- each request runs in its own container |
 | Infrastructure | AWS EC2 t3.small, Amazon Linux 2023 | Persistent compute for long-running process, ~$10-35/month total |
 
 ## Roadmap

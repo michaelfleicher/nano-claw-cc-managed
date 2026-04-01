@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-04-01)
 Phase: 1 of 3 (Infrastructure & WhatsApp)
 Plan: 0 of 0 in current phase
 Status: Ready to plan
-Last activity: 2026-04-01 — Roadmap created
+Last activity: 2026-04-01- Roadmap created
 
 Progress: [░░░░░░░░░░] 0%
 

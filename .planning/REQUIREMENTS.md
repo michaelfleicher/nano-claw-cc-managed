@@ -58,7 +58,7 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Feature | Reason |
 |---------|--------|
-| Full autopilot (replying without being tagged) | v1 requires explicit tagging — trust must be built gradually |
+| Full autopilot (replying without being tagged) | v1 requires explicit tagging- trust must be built gradually |
 | Email integration | WhatsApp only for v1; email is a separate milestone |
 | Web dashboard or admin panel | All interaction via WhatsApp; no frontend to maintain |
 | CRM integration | 5-10 clients don't need Salesforce; per-group memory suffices |
