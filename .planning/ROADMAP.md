@@ -42,11 +42,11 @@ Plans:
   2. Replies match the consultant's tone and communication style (validated by consultant reviewing sample conversations)
   3. When the assistant encounters a question outside its knowledge or a sensitive topic, it explicitly hands off to the consultant rather than guessing
   4. The assistant never fabricates pricing, availability claims, or technical commitments not present in the knowledge brief
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md -- Write global knowledge brief and client context template
+- [ ] 02-02-PLAN.md -- Validation tests and consultant review checkpoint
 
 ### Phase 3: Calendar & Automation
 **Goal**: The assistant can check availability, schedule meetings on Google Calendar, and execute recurring tasks on behalf of the consultant
@@ -71,5 +71,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure & WhatsApp | 0/0 | Not started | - |
-| 2. Knowledge & Communication | 0/0 | Not started | - |
+| 2. Knowledge & Communication | 0/2 | Planned | - |
 | 3. Calendar & Automation | 0/0 | Not started | - |
