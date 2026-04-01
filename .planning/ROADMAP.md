@@ -27,11 +27,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. The EC2 instance stays running 24/7 and automatically recovers from crashes without manual intervention
   3. Messages in one client group never appear in another client group's context
   4. The NanoClaw process runs within the memory constraints of a t3.small instance without OOM kills
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md -- Fork NanoClaw, merge WhatsApp skill, prepare configuration and EC2 scripts
+- [ ] 01-02-PLAN.md -- Provision EC2 and deploy NanoClaw with systemd, Docker, and swap
+- [ ] 01-03-PLAN.md -- Connect WhatsApp, register groups, verify end-to-end message flow and isolation
 
 ### Phase 2: Knowledge & Communication
 **Goal**: The assistant understands the consultant's services, pricing, and communication style, and replies to clients as if it were the consultant
@@ -70,6 +71,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure & WhatsApp | 0/0 | Not started | - |
+| 1. Infrastructure & WhatsApp | 0/3 | Planned | - |
 | 2. Knowledge & Communication | 0/2 | Planned | - |
 | 3. Calendar & Automation | 0/0 | Not started | - |
