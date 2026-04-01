@@ -58,11 +58,12 @@ Plans:
   2. The assistant can create a Google Calendar event with client name, time, topic, and meeting link from a WhatsApp conversation
   3. Google Calendar authentication uses a service account that does not require periodic manual re-authorization
   4. User can instruct the assistant to send a recurring message (e.g., weekly reminder) and it executes on schedule
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md -- Build gcal MCP server with check_availability, create_event, and list_events tools (TDD)
+- [ ] 03-02-PLAN.md -- Wire gcal into agent runner, mount secrets volume, add calendar instructions to agent
+- [ ] 03-03-PLAN.md -- Add task scheduling instructions and verify recurring automation end-to-end
 
 ## Progress
 
@@ -73,4 +74,4 @@ Phases execute in numeric order: 1 -> 2 -> 3
 |-------|----------------|--------|-----------|
 | 1. Infrastructure & WhatsApp | 0/3 | Planned | - |
 | 2. Knowledge & Communication | 0/2 | Planned | - |
-| 3. Calendar & Automation | 0/0 | Not started | - |
+| 3. Calendar & Automation | 0/3 | Planned | - |
