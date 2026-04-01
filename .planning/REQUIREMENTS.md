@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: NanoClaw forked, configured, and running on AWS EC2 t3.small with process management (systemd)
+- [x] **INFRA-01**: NanoClaw forked, configured, and running on AWS EC2 t3.small with process management (systemd)
 - [ ] **INFRA-02**: WhatsApp channel connected to consultant's personal phone number via NanoClaw skill
 - [ ] **INFRA-03**: Per-group context isolation so client conversations never leak between each other
 - [ ] **INFRA-04**: EC2 instance runs 24/7 with automatic crash recovery and log rotation
-- [ ] **INFRA-05**: Container concurrency tuned for t3.small (MAX_CONCURRENT_CONTAINERS=1-2, swap enabled)
+- [x] **INFRA-05**: Container concurrency tuned for t3.small (MAX_CONCURRENT_CONTAINERS=1-2, swap enabled)
 
 ### Communication
 
@@ -72,11 +72,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 1 | Pending |
+| INFRA-01 | Phase 1 | Complete |
 | INFRA-02 | Phase 1 | Pending |
 | INFRA-03 | Phase 1 | Pending |
 | INFRA-04 | Phase 1 | Pending |
-| INFRA-05 | Phase 1 | Pending |
+| INFRA-05 | Phase 1 | Complete |
 | COMM-01 | Phase 1 | Pending |
 | COMM-02 | Phase 2 | Pending |
 | COMM-03 | Phase 2 | Pending |
