@@ -72,26 +72,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| INFRA-05 | — | Pending |
-| COMM-01 | — | Pending |
-| COMM-02 | — | Pending |
-| COMM-03 | — | Pending |
-| COMM-04 | — | Pending |
-| COMM-05 | — | Pending |
-| SCHED-01 | — | Pending |
-| SCHED-02 | — | Pending |
-| SCHED-03 | — | Pending |
-| AUTO-01 | — | Pending |
+| INFRA-01 | Phase 1 | Pending |
+| INFRA-02 | Phase 1 | Pending |
+| INFRA-03 | Phase 1 | Pending |
+| INFRA-04 | Phase 1 | Pending |
+| INFRA-05 | Phase 1 | Pending |
+| COMM-01 | Phase 1 | Pending |
+| COMM-02 | Phase 2 | Pending |
+| COMM-03 | Phase 2 | Pending |
+| COMM-04 | Phase 2 | Pending |
+| COMM-05 | Phase 2 | Pending |
+| SCHED-01 | Phase 3 | Pending |
+| SCHED-02 | Phase 3 | Pending |
+| SCHED-03 | Phase 3 | Pending |
+| AUTO-01 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-01*
-*Last updated: 2026-04-01 after initial definition*
+*Last updated: 2026-04-01 after roadmap creation*
